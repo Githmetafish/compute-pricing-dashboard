@@ -107,11 +107,23 @@ function priceNear(text, label, windowSize = 700) {
   return match ? Number(match[1]) : null;
 }
 
-function sectionBetween(text, startLabel, endLabel) {
-  const start = text.indexOf(startLabel);
-  if (start === -1) return text;
-  const end = text.indexOf(endLabel, start + startLabel.length);
+function sectionFromAnchor(text, startLabels, endLabel) {
+  const starts = startLabels
+    .map((label) => text.indexOf(label))
+    .filter((index) => index !== -1);
+  if (!starts.length) return text;
+  const start = Math.min(...starts);
+  const end = text.indexOf(endLabel, start + 1);
   return end === -1 ? text.slice(start) : text.slice(start, end);
+}
+
+function logRows(sourceName, rows) {
+  console.log(`${sourceName}: ${rows.length} rows`);
+  for (const row of rows) {
+    const price = Number.isFinite(row.price) ? row.price.toFixed(4) : "n/a";
+    const supply = row.supply ? `, supply ${row.supply}` : "";
+    console.log(`  ${row.platform} | ${row.sku} | ${row.mode} | $${price}/GPU-hr${supply}`);
+  }
 }
 
 function systemPricesNear(text, label) {
@@ -132,7 +144,12 @@ async function fetchRunPod(source) {
   const html = await fetchText(source.url);
   const normalText = stripHtml(html);
   const loose = looseText(html);
-  const text = sectionBetween(`${normalText} ${loose}`, "Pods", "Serverless");
+  const combinedText = `${normalText} ${loose}`;
+  const text = sectionFromAnchor(
+    combinedText,
+    ["GPU Community Cloud Secure Cloud", ">80GB VRAM", "B300 288 GB"],
+    "Serverless",
+  );
   const targets = [
     ["H100 SXM", "H100 SXM"],
     ["H100 NVL", "H100 NVL"],
@@ -294,7 +311,7 @@ async function fetchGcpSpot(source) {
   }
 
   const manualPath = `${rootDir}/${source.inputFile}`;
-  return readRows(manualPath).map((row) =>
+  const rows = readRows(manualPath).map((row) =>
     normalize({
       ...row,
       platform: row.platform || source.platform,
@@ -302,6 +319,10 @@ async function fetchGcpSpot(source) {
       frequency: row.frequency || source.frequency,
     }),
   );
+  if (!rows.length) {
+    console.warn(`gcpSpot: no rows in ${source.inputFile}; set ${source.remoteEnv} or update the manual file`);
+  }
+  return rows;
 }
 
 const fetchers = {
@@ -326,7 +347,7 @@ async function main() {
     try {
       const rows = (await fetcher(source)).filter(isValid);
       latestRows.push(...rows);
-      console.log(`${name}: ${rows.length} rows`);
+      logRows(name, rows);
     } catch (error) {
       console.warn(`${name}: ${error.message}`);
     }
