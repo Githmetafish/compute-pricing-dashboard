@@ -222,11 +222,6 @@ async function fetchCoreWeave(source) {
 
 async function fetchVast(source) {
   const apiKey = process.env.VAST_API_KEY;
-  if (!apiKey) {
-    console.warn("skip vast: VAST_API_KEY is not set");
-    return [];
-  }
-
   const gpuNames = [
     ["H100 SXM", "H100 SXM"],
     ["H100 NVL", "H100 NVL"],
@@ -236,12 +231,11 @@ async function fetchVast(source) {
   const rows = [];
 
   for (const [sku, gpuName] of gpuNames) {
+    const headers = { "content-type": "application/json" };
+    if (apiKey) headers.authorization = `Bearer ${apiKey}`;
     const response = await fetch(source.url, {
       method: "POST",
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        "content-type": "application/json",
-      },
+      headers,
       body: JSON.stringify({
         verified: { eq: true },
         rentable: { eq: true },
@@ -251,6 +245,10 @@ async function fetchVast(source) {
         limit: 50,
       }),
     });
+    if ((response.status === 401 || response.status === 403) && !apiKey) {
+      console.warn("skip vast: anonymous request was rejected; set VAST_API_KEY");
+      return [];
+    }
     if (!response.ok) throw new Error(`vast ${gpuName} returned ${response.status}`);
     const json = await response.json();
     const offers = json.offers || json.bundles || [];

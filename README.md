@@ -94,7 +94,7 @@ npm run fetch:prices -- --sources runpod,lambda,coreweave
 | RunPod | 公开 pricing 页 | 抓 Pods 的 Secure Cloud 报价 |
 | Lambda | 公开 pricing 页 | 抓 Instances 的 `PRICE/GPU/HR` |
 | CoreWeave | 公开 pricing 页 | 抓 on-demand/spot，按 GPU count 折成单 GPU 小时 |
-| Vast.ai | 官方 bundles API | 需要 `VAST_API_KEY`，取 p25 单 GPU 小时价和 offer 数 |
+| Vast.ai | 官方 bundles API | 先尝试匿名请求；如果被拒，再配置 `VAST_API_KEY`。取 p25 单 GPU 小时价和 offer 数 |
 | GCP Spot | 手动 JSON 或远程 JSON | 用 `data/manual/gcp-spot.json` 或 `GCP_SPOT_JSON_URL` 注入 |
 
 Vercel 只负责展示，不适合把抓取结果写回仓库。推荐用 GitHub Actions 定时抓取并提交 `data/compute-pricing.json`，提交后 Vercel 自动重新部署。
