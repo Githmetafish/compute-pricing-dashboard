@@ -229,7 +229,7 @@ function renderCards() {
   const cards = [
     ["平均价格", fmtUsd(avgPrice), "当前 SKU 各平台/模式最新价均值，不跨 SXM/NVL 混算"],
     [trendLabel(), fmtChange(avgChange), trendNote()],
-    ["可用 GPU", Math.round(totalSupply).toLocaleString("en-US"), "最新横截面供给数量合计"],
+    ["可观察供给", Math.round(totalSupply).toLocaleString("en-US"), "Vast.ai 为可观察 offer 数；其他平台 0 多数表示未披露"],
     ["平均 Spot 折扣", fmtPct(avgDiscount), "折扣扩大通常先于 list price 变化"],
   ];
 
@@ -306,7 +306,7 @@ function renderSignals() {
 function renderChart() {
   const metricLabels = {
     price: "价格趋势",
-    supply: "可用供给",
+    supply: "可观察供给",
     discount: "折扣率",
   };
   els.chartTitle.textContent = `${state.sku} ${metricLabels[state.metric]}`;

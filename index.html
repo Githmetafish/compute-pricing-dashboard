@@ -53,7 +53,7 @@
             视图
             <select id="metricMode">
               <option value="price">价格趋势</option>
-              <option value="supply">可用供给</option>
+              <option value="supply">可观察供给</option>
               <option value="discount">折扣率</option>
             </select>
           </label>
@@ -63,6 +63,11 @@
       <section class="sku-context" aria-label="SKU 口径">
         <strong id="skuRole">-</strong>
         <span id="skuSpec">-</span>
+      </section>
+
+      <section class="supply-context" aria-label="供给口径">
+        <strong>供给口径</strong>
+        <span>Vast.ai 为可观察 offer 数；其他平台显示 0 表示未抓到公开实时库存，不代表没有可租 GPU。</span>
       </section>
 
       <section class="dashboard-grid">
@@ -110,7 +115,7 @@
                 <th>$/GPU-hour</th>
                 <th>7日均价</th>
                 <th id="changeHeader">4周变化</th>
-                <th>可用 GPU</th>
+                <th>可观察供给</th>
                 <th>Spot 折扣</th>
                 <th>频率</th>
               </tr>

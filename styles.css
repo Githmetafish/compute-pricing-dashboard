@@ -42,6 +42,7 @@ input {
 .status-strip,
 .control-band,
 .sku-context,
+.supply-context,
 .panel,
 .table-section,
 .schema-section {
@@ -170,7 +171,8 @@ h2 {
   padding: 14px;
 }
 
-.sku-context {
+.sku-context,
+.supply-context {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -178,13 +180,15 @@ h2 {
   padding: 12px 14px;
 }
 
-.sku-context strong {
+.sku-context strong,
+.supply-context strong {
   flex: 0 0 auto;
   color: var(--accent);
   font-size: 14px;
 }
 
-.sku-context span {
+.sku-context span,
+.supply-context span {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.45;
@@ -450,6 +454,7 @@ code {
   .topbar,
   .control-band,
   .sku-context,
+  .supply-context,
   .panel-header,
   .section-header {
     align-items: stretch;
