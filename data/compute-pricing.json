@@ -74,8 +74,8 @@
     "platform": "Vast.ai",
     "sku": "B200",
     "mode": "market",
-    "price": 4.689583333333333,
-    "supply": 10,
+    "price": 5.189930555555556,
+    "supply": 11,
     "discount": 0,
     "frequency": "daily"
   },
@@ -94,8 +94,8 @@
     "platform": "Vast.ai",
     "sku": "H100 NVL",
     "mode": "market",
-    "price": 1.9896296296296299,
-    "supply": 9,
+    "price": 2.1344444444444446,
+    "supply": 5,
     "discount": 0,
     "frequency": "daily"
   },
@@ -175,7 +175,7 @@
     "sku": "H100 SXM",
     "mode": "market",
     "price": 1.7355555555555555,
-    "supply": 29,
+    "supply": 22,
     "discount": 0,
     "frequency": "daily"
   },
@@ -224,8 +224,8 @@
     "platform": "Vast.ai",
     "sku": "H200 SXM",
     "mode": "market",
-    "price": 3.5142448830409356,
-    "supply": 26,
+    "price": 3.2907894736842103,
+    "supply": 9,
     "discount": 0,
     "frequency": "daily"
   }
