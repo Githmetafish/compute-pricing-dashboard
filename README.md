@@ -87,6 +87,12 @@ npm run fetch:prices
 npm run fetch:prices -- --sources runpod,lambda,coreweave
 ```
 
+只测试抓取、不写入生产数据：
+
+```bash
+npm run fetch:prices -- --sources gcpSpot --dry-run --soft-fail
+```
+
 当前抓取策略：
 
 | 来源 | 方式 | 说明 |
@@ -95,7 +101,7 @@ npm run fetch:prices -- --sources runpod,lambda,coreweave
 | Lambda | 公开 pricing 页 | 抓 Instances 的 `PRICE/GPU/HR` |
 | CoreWeave | 公开 pricing 页 | 抓 on-demand/spot，按 GPU count 折成单 GPU 小时 |
 | Vast.ai | 官方 bundles API | 先尝试匿名请求；如果被拒，再配置 `VAST_API_KEY`。取 p25 单 GPU 小时价和 offer 数 |
-| GCP Spot | 手动 JSON 或远程 JSON | 用 `data/manual/gcp-spot.json` 或 `GCP_SPOT_JSON_URL` 注入 |
+| GCP Spot | Cloud Billing Catalog API | 配置 `GCP_BILLING_API_KEY` 后抓 Compute Engine 的公开 Spot/Preemptible GPU SKU；未配置时回退到 `GCP_SPOT_JSON_URL` 或 `data/manual/gcp-spot.json` |
 
 Vercel 只负责展示，不适合把抓取结果写回仓库。推荐用 GitHub Actions 定时抓取并提交 `data/compute-pricing.json`，提交后 Vercel 自动重新部署。
 
@@ -115,10 +121,11 @@ Vercel 只负责展示，不适合把抓取结果写回仓库。推荐用 GitHub
 
 ```text
 VAST_API_KEY
+GCP_BILLING_API_KEY
 GCP_SPOT_JSON_URL
 ```
 
-没有 `VAST_API_KEY` 时会跳过 Vast.ai；没有 `GCP_SPOT_JSON_URL` 时会读取 `data/manual/gcp-spot.json`。
+没有 `VAST_API_KEY` 时会跳过 Vast.ai。没有 `GCP_BILLING_API_KEY` 时会跳过 Google Cloud Billing Catalog API，并继续尝试 `GCP_SPOT_JSON_URL` 或 `data/manual/gcp-spot.json`。
 
 ## 数据格式
 

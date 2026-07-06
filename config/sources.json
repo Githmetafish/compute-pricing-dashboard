@@ -42,8 +42,37 @@
     "gcpSpot": {
       "platform": "GCP Spot",
       "frequency": "daily",
+      "serviceId": "6F81-5844-456A",
+      "apiKeyEnv": "GCP_BILLING_API_KEY",
       "inputFile": "data/manual/gcp-spot.json",
-      "remoteEnv": "GCP_SPOT_JSON_URL"
+      "remoteEnv": "GCP_SPOT_JSON_URL",
+      "regions": ["us-central1", "us-east5", "us-west4"],
+      "targets": [
+        {
+          "sku": "H100 SXM",
+          "matchAny": ["H100"],
+          "excludeAny": ["H100 NVL", "Virtual Workstation", "vWS"],
+          "gpuCount": 1
+        },
+        {
+          "sku": "H100 NVL",
+          "matchAny": ["H100 NVL"],
+          "excludeAny": ["Virtual Workstation", "vWS"],
+          "gpuCount": 1
+        },
+        {
+          "sku": "H200 SXM",
+          "matchAny": ["H200"],
+          "excludeAny": ["Virtual Workstation", "vWS"],
+          "gpuCount": 1
+        },
+        {
+          "sku": "B200",
+          "matchAny": ["B200"],
+          "excludeAny": ["Virtual Workstation", "vWS"],
+          "gpuCount": 1
+        }
+      ]
     }
   }
 }

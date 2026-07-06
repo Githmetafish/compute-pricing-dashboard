@@ -26,3 +26,5 @@ data/compute-pricing.json
 ```
 
 `discount` 用小数表示，`0.59` 表示 59% 折扣。
+
+GCP Spot 默认优先通过 Google Cloud Billing Catalog API 抓取公开 Spot/Preemptible GPU SKU。要启用自动抓取，在 GitHub Actions secrets 里设置 `GCP_BILLING_API_KEY`。未设置时，脚本会继续尝试 `GCP_SPOT_JSON_URL` 和 `data/manual/gcp-spot.json`。

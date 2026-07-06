@@ -126,6 +126,115 @@ function logRows(sourceName, rows) {
   }
 }
 
+function moneyToNumber(money = {}) {
+  return Number(money.units || 0) + Number(money.nanos || 0) / 1e9;
+}
+
+function skuUnitPrice(sku) {
+  const rate = sku.pricingInfo?.[0]?.pricingExpression?.tieredRates?.[0];
+  if (!rate?.unitPrice) return null;
+  const price = moneyToNumber(rate.unitPrice);
+  return Number.isFinite(price) ? price : null;
+}
+
+function skuRegions(sku) {
+  return sku.serviceRegions?.length ? sku.serviceRegions : sku.geoTaxonomy?.regions || [];
+}
+
+function textIncludesAny(text, patterns = []) {
+  return patterns.some((pattern) => text.toLowerCase().includes(String(pattern).toLowerCase()));
+}
+
+function matchesGcpTarget(sku, target) {
+  const description = String(sku.description || "");
+  const resourceGroup = String(sku.category?.resourceGroup || "");
+  const isGpu = resourceGroup.toLowerCase().includes("gpu") || description.toLowerCase().includes("gpu");
+  return isGpu && textIncludesAny(description, target.matchAny) && !textIncludesAny(description, target.excludeAny);
+}
+
+function isSpotSku(sku) {
+  const usage = String(sku.category?.usageType || "").toLowerCase();
+  const description = String(sku.description || "").toLowerCase();
+  return usage.includes("preemptible") || usage.includes("spot") || description.includes("preemptible") || description.includes("spot");
+}
+
+function isOnDemandSku(sku) {
+  const usage = String(sku.category?.usageType || "").toLowerCase();
+  const description = String(sku.description || "").toLowerCase();
+  return (
+    usage.includes("ondemand") ||
+    (!isSpotSku(sku) && !usage.includes("commit") && !description.includes("commitment") && !description.includes("reservation"))
+  );
+}
+
+function gcpCatalogRows(skus, source) {
+  const regions = source.regions || [];
+  const rowsByKey = new Map();
+  const onDemandByKey = new Map();
+
+  for (const sku of skus) {
+    const price = skuUnitPrice(sku);
+    if (price === null || price <= 0) continue;
+
+    for (const target of source.targets || []) {
+      if (!matchesGcpTarget(sku, target)) continue;
+      const matchedRegions = skuRegions(sku).filter((region) => regions.includes(region));
+      if (!matchedRegions.length) continue;
+
+      for (const region of matchedRegions) {
+        const key = `${region}|${target.sku}`;
+        const perGpuPrice = price / Number(target.gpuCount || 1);
+        if (isSpotSku(sku)) {
+          const existing = rowsByKey.get(key);
+          if (!existing || perGpuPrice < existing.price) {
+            rowsByKey.set(key, {
+              region,
+              sku: target.sku,
+              price: perGpuPrice,
+            });
+          }
+        } else if (isOnDemandSku(sku)) {
+          const existing = onDemandByKey.get(key);
+          if (!existing || perGpuPrice < existing) onDemandByKey.set(key, perGpuPrice);
+        }
+      }
+    }
+  }
+
+  return [...rowsByKey.values()].map((row) => {
+    const onDemand = onDemandByKey.get(`${row.region}|${row.sku}`);
+    return normalize({
+      platform: `${source.platform} ${row.region}`,
+      sku: row.sku,
+      mode: "spot",
+      price: row.price,
+      supply: 0,
+      discount: onDemand ? Math.max(0, 1 - row.price / onDemand) : 0,
+      frequency: source.frequency,
+    });
+  });
+}
+
+async function fetchGcpCatalog(source, apiKey) {
+  const allSkus = [];
+  let pageToken = "";
+  do {
+    const url = new URL(`https://cloudbilling.googleapis.com/v1/services/${source.serviceId}/skus`);
+    url.searchParams.set("key", apiKey);
+    url.searchParams.set("pageSize", "5000");
+    if (pageToken) url.searchParams.set("pageToken", pageToken);
+
+    const response = await fetch(url, { headers: { accept: "application/json" } });
+    if (!response.ok) throw new Error(`GCP Catalog returned ${response.status}`);
+    const json = await response.json();
+    allSkus.push(...(json.skus || []));
+    pageToken = json.nextPageToken || "";
+  } while (pageToken);
+
+  console.log(`gcpSpot: scanned ${allSkus.length} Compute Engine SKUs from Cloud Billing Catalog API`);
+  return gcpCatalogRows(allSkus, source);
+}
+
 function systemPricesNear(text, label) {
   const index = text.indexOf(label);
   if (index === -1) return {};
@@ -296,6 +405,15 @@ async function fetchVast(source) {
 }
 
 async function fetchGcpSpot(source) {
+  const apiKey = process.env[source.apiKeyEnv];
+  if (apiKey) {
+    const rows = await fetchGcpCatalog(source, apiKey);
+    if (rows.length) return rows;
+    console.warn(`gcpSpot: no matching rows from Cloud Billing Catalog API for ${source.regions.join(", ")}`);
+  } else {
+    console.warn(`gcpSpot: ${source.apiKeyEnv} is not set; skipping Cloud Billing Catalog API`);
+  }
+
   const url = process.env[source.remoteEnv];
   if (url) {
     const response = await fetch(url, { headers: { accept: "application/json" } });
@@ -320,7 +438,7 @@ async function fetchGcpSpot(source) {
     }),
   );
   if (!rows.length) {
-    console.warn(`gcpSpot: no rows in ${source.inputFile}; set ${source.remoteEnv} or update the manual file`);
+    console.warn(`gcpSpot: no rows in ${source.inputFile}; set ${source.apiKeyEnv}, set ${source.remoteEnv}, or update the manual file`);
   }
   return rows;
 }
@@ -356,6 +474,11 @@ async function main() {
   const existing = readRows(outputPath);
   if (!latestRows.length) {
     console.log("No new rows. Existing data left unchanged.");
+    return;
+  }
+
+  if (args.has("--dry-run")) {
+    console.log(`Dry run: ${latestRows.length} new rows for ${today}; data/compute-pricing.json left unchanged.`);
     return;
   }
 

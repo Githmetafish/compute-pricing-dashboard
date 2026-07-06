@@ -24,6 +24,7 @@ jobs:
       - name: Fetch latest pricing
         env:
           VAST_API_KEY: ${{ secrets.VAST_API_KEY }}
+          GCP_BILLING_API_KEY: ${{ secrets.GCP_BILLING_API_KEY }}
           GCP_SPOT_JSON_URL: ${{ secrets.GCP_SPOT_JSON_URL }}
         run: npm run fetch:prices -- --soft-fail
 
