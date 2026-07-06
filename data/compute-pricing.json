@@ -31,6 +31,16 @@
   },
   {
     "date": "2026-07-06",
+    "platform": "RunPod",
+    "sku": "B200",
+    "mode": "secure",
+    "price": 5.89,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-07-06",
     "platform": "Vast.ai",
     "sku": "B200",
     "mode": "market",
@@ -41,10 +51,20 @@
   },
   {
     "date": "2026-07-06",
+    "platform": "RunPod",
+    "sku": "H100 NVL",
+    "mode": "secure",
+    "price": 3.19,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-07-06",
     "platform": "Vast.ai",
     "sku": "H100 NVL",
     "mode": "market",
-    "price": 1.9925925925925927,
+    "price": 1.9896296296296299,
     "supply": 10,
     "discount": 0,
     "frequency": "daily"
@@ -81,11 +101,21 @@
   },
   {
     "date": "2026-07-06",
+    "platform": "RunPod",
+    "sku": "H100 SXM",
+    "mode": "secure",
+    "price": 3.29,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-07-06",
     "platform": "Vast.ai",
     "sku": "H100 SXM",
     "mode": "market",
     "price": 1.7355555555555555,
-    "supply": 29,
+    "supply": 28,
     "discount": 0,
     "frequency": "daily"
   },
@@ -108,6 +138,16 @@
     "supply": 0,
     "discount": 0.5850515463917525,
     "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "RunPod",
+    "sku": "H200 SXM",
+    "mode": "secure",
+    "price": 4.39,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
   },
   {
     "date": "2026-07-06",
