@@ -84,12 +84,34 @@ function stripHtml(html) {
     .trim();
 }
 
+function looseText(html) {
+  return html
+    .replace(/\\u0026/g, "&")
+    .replace(/\\u003c/gi, "<")
+    .replace(/\\u003e/gi, ">")
+    .replace(/\\"/g, '"')
+    .replace(/\\n/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#x2F;/g, "/")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function priceNear(text, label, windowSize = 700) {
   const index = text.indexOf(label);
   if (index === -1) return null;
   const fragment = text.slice(index, index + windowSize);
   const match = fragment.match(/\$(\d+(?:\.\d+)?)(?:\s*\/?\s*hr|\s*\/?\s*Hour)?/i);
   return match ? Number(match[1]) : null;
+}
+
+function sectionBetween(text, startLabel, endLabel) {
+  const start = text.indexOf(startLabel);
+  if (start === -1) return text;
+  const end = text.indexOf(endLabel, start + startLabel.length);
+  return end === -1 ? text.slice(start) : text.slice(start, end);
 }
 
 function systemPricesNear(text, label) {
@@ -107,7 +129,10 @@ function systemPricesNear(text, label) {
 }
 
 async function fetchRunPod(source) {
-  const text = stripHtml(await fetchText(source.url));
+  const html = await fetchText(source.url);
+  const normalText = stripHtml(html);
+  const loose = looseText(html);
+  const text = sectionBetween(`${normalText} ${loose}`, "Pods", "Serverless");
   const targets = [
     ["H100 SXM", "H100 SXM"],
     ["H100 NVL", "H100 NVL"],
