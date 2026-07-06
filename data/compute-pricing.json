@@ -85,7 +85,7 @@
     "sku": "H100 SXM",
     "mode": "market",
     "price": 1.7355555555555555,
-    "supply": 30,
+    "supply": 29,
     "discount": 0,
     "frequency": "daily"
   },
@@ -114,7 +114,7 @@
     "platform": "Vast.ai",
     "sku": "H200 SXM",
     "mode": "market",
-    "price": 3.5153318713450292,
+    "price": 3.5142448830409356,
     "supply": 25,
     "discount": 0,
     "frequency": "daily"
