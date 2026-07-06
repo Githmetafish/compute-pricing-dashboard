@@ -1,1 +1,82 @@
-[]
+[
+  {
+    "date": "2026-07-06",
+    "platform": "CoreWeave",
+    "sku": "B200",
+    "mode": "on-demand",
+    "price": 8.6,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "CoreWeave",
+    "sku": "B200",
+    "mode": "spot",
+    "price": 4.26375,
+    "supply": 0,
+    "discount": 0.5042151162790698,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "Lambda",
+    "sku": "B200",
+    "mode": "on-demand",
+    "price": 6.69,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "CoreWeave",
+    "sku": "H100 SXM",
+    "mode": "on-demand",
+    "price": 6.155,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "CoreWeave",
+    "sku": "H100 SXM",
+    "mode": "spot",
+    "price": 2.46375,
+    "supply": 0,
+    "discount": 0.5997156783103168,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "Lambda",
+    "sku": "H100 SXM",
+    "mode": "on-demand",
+    "price": 3.99,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "CoreWeave",
+    "sku": "H200 SXM",
+    "mode": "on-demand",
+    "price": 6.305,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "CoreWeave",
+    "sku": "H200 SXM",
+    "mode": "spot",
+    "price": 2.61625,
+    "supply": 0,
+    "discount": 0.5850515463917525,
+    "frequency": "weekly"
+  }
+]
