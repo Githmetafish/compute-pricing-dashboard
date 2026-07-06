@@ -1,6 +1,28 @@
 const DATA_URLS = ["./data/compute-pricing.json", "./sample-data.json"];
 const SAMPLE_DATA_URL = "./sample-data.json";
 const colors = ["#126d62", "#2f6fab", "#b65b0f", "#7d4ac7", "#157347", "#b42318"];
+const skuProfiles = {
+  "H100 SXM": {
+    order: 10,
+    role: "训练/HPC 口径",
+    spec: "SXM 形态，80GB HBM3，高功耗高算力；不与 H100 NVL 混算。",
+  },
+  "H100 NVL": {
+    order: 20,
+    role: "LLM 推理口径",
+    spec: "PCIe NVL 形态，94GB HBM3，面向大模型推理；价格不能直接等同 H100 SXM。",
+  },
+  "H200 SXM": {
+    order: 30,
+    role: "高显存训练/推理口径",
+    spec: "H200 SXM 形态，显存容量和带宽高于 H100；单独观察，不并入 H100。",
+  },
+  B200: {
+    order: 40,
+    role: "Blackwell 新代际口径",
+    spec: "B200 属于新一代 GPU，供需和定价周期与 H100/H200 分开看。",
+  },
+};
 
 let records = [];
 let state = {
@@ -20,6 +42,8 @@ const els = {
   chartTitle: document.querySelector("#chartTitle"),
   chartLegend: document.querySelector("#chartLegend"),
   chart: document.querySelector("#trendChart"),
+  skuRole: document.querySelector("#skuRole"),
+  skuSpec: document.querySelector("#skuSpec"),
   signalList: document.querySelector("#signalList"),
   metricCards: document.querySelector("#metricCards"),
   snapshotTable: document.querySelector("#snapshotTable"),
@@ -30,6 +54,7 @@ const els = {
 
 const unique = (items) => [...new Set(items)];
 const byDate = (a, b) => new Date(a.date) - new Date(b.date);
+const bySkuOrder = (a, b) => (skuProfiles[a]?.order || 999) - (skuProfiles[b]?.order || 999) || a.localeCompare(b);
 const fmtUsd = (n) => `$${Number(n).toFixed(2)}`;
 const fmtPct = (n) => `${Math.round(Number(n) * 100)}%`;
 const fmtChange = (n) => `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`;
@@ -87,6 +112,7 @@ function initState() {
 function render() {
   renderFilters();
   renderStatus();
+  renderSkuContext();
   renderCards();
   renderSignals();
   renderChart();
@@ -94,7 +120,7 @@ function render() {
 }
 
 function renderFilters() {
-  const skus = unique(records.map((r) => r.sku));
+  const skus = unique(records.map((r) => r.sku)).sort(bySkuOrder);
   els.skuTabs.innerHTML = skus
     .map((sku) => `<button type="button" class="${sku === state.sku ? "active" : ""}" data-sku="${sku}">${sku}</button>`)
     .join("");
@@ -103,6 +129,15 @@ function renderFilters() {
   if (!platforms.includes(state.platform)) state.platform = "全部平台";
   els.platformFilter.innerHTML = platforms.map((p) => `<option ${p === state.platform ? "selected" : ""}>${p}</option>`).join("");
   els.metricMode.value = state.metric;
+}
+
+function renderSkuContext() {
+  const profile = skuProfiles[state.sku] || {
+    role: "独立 SKU 口径",
+    spec: "当前视图只比较完全相同的 SKU，不跨不同形态或不同代际合并。",
+  };
+  els.skuRole.textContent = profile.role;
+  els.skuSpec.textContent = profile.spec;
 }
 
 function renderStatus() {
@@ -147,8 +182,8 @@ function renderCards() {
   const avgDiscount = latest.reduce((sum, r) => sum + r.discount, 0) / Math.max(latest.length, 1);
 
   const cards = [
-    ["平均价格", fmtUsd(avgPrice), "当前 SKU 各平台最新价均值"],
-    ["4周均价变化", fmtChange(avgChange), "负值代表边际租赁价格走弱"],
+    ["平均价格", fmtUsd(avgPrice), "当前 SKU 各平台最新价均值，不跨 SXM/NVL 混算"],
+    ["4周均价变化", fmtChange(avgChange), "同一 SKU 口径下的价格变化"],
     ["可用 GPU", Math.round(totalSupply).toLocaleString("en-US"), "最新横截面供给数量合计"],
     ["平均 Spot 折扣", fmtPct(avgDiscount), "折扣扩大通常先于 list price 变化"],
   ];

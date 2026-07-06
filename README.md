@@ -107,6 +107,17 @@ Vercel 只负责展示，不适合把抓取结果写回仓库。推荐用 GitHub
 
 如果某次抓取没有拿到任何有效数据，脚本会保留旧的 `data/compute-pricing.json`，不会用样本数据覆盖。
 
+SKU 口径：
+
+| SKU | 口径 |
+|---|---|
+| H100 SXM | 训练/HPC 和高性能 HGX/DGX 供给口径 |
+| H100 NVL | LLM 推理型 PCIe NVL 供给口径 |
+| H200 SXM | 高显存 Hopper 供给口径 |
+| B200 | Blackwell 新代际供给口径 |
+
+`H100 SXM` 和 `H100 NVL` 形态、显存、功耗和典型用途不同，不做合并均价。
+
 ## GitHub Actions 定时更新
 
 已经内置 workflow：

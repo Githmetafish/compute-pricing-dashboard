@@ -2,7 +2,7 @@
   "trackedSkus": [
     {
       "sku": "H100 SXM",
-      "aliases": ["H100 SXM", "NVIDIA H100 SXM", "NVIDIA HGX H100", "H100"]
+      "aliases": ["H100 SXM", "NVIDIA H100 SXM", "NVIDIA HGX H100"]
     },
     {
       "sku": "H100 NVL",
