@@ -31,6 +31,26 @@
   },
   {
     "date": "2026-07-06",
+    "platform": "Vast.ai",
+    "sku": "B200",
+    "mode": "market",
+    "price": 4.689583333333333,
+    "supply": 9,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "Vast.ai",
+    "sku": "H100 NVL",
+    "mode": "market",
+    "price": 1.9925925925925927,
+    "supply": 10,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-07-06",
     "platform": "CoreWeave",
     "sku": "H100 SXM",
     "mode": "on-demand",
@@ -61,6 +81,16 @@
   },
   {
     "date": "2026-07-06",
+    "platform": "Vast.ai",
+    "sku": "H100 SXM",
+    "mode": "market",
+    "price": 1.7355555555555555,
+    "supply": 30,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-07-06",
     "platform": "CoreWeave",
     "sku": "H200 SXM",
     "mode": "on-demand",
@@ -78,5 +108,15 @@
     "supply": 0,
     "discount": 0.5850515463917525,
     "frequency": "weekly"
+  },
+  {
+    "date": "2026-07-06",
+    "platform": "Vast.ai",
+    "sku": "H200 SXM",
+    "mode": "market",
+    "price": 3.5153318713450292,
+    "supply": 25,
+    "discount": 0,
+    "frequency": "daily"
   }
 ]
