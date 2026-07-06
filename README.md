@@ -103,7 +103,7 @@ npm run fetch:prices -- --sources gcpSpot --dry-run --soft-fail
 | Vast.ai | 官方 bundles API | 先尝试匿名请求；如果被拒，再配置 `VAST_API_KEY`。取 p25 单 GPU 小时价和 offer 数 |
 | GCP Spot | Cloud Billing Catalog API | 配置 `GCP_BILLING_API_KEY` 后抓 Compute Engine 的公开 Spot/Preemptible GPU SKU；未配置时回退到 `GCP_SPOT_JSON_URL` 或 `data/manual/gcp-spot.json` |
 
-供给口径：`supply` 表示可观察供给，不是统一库存口径。Vast.ai 当前用符合条件的公开 offer 数；RunPod、Lambda、CoreWeave、GCP Spot 未披露实时库存时记为 `0`，表示未抓到公开供给数据，不代表没有库存。
+供给口径：`supply` 表示可观察供给，不是统一库存口径。Vast.ai 当前用符合条件的公开 offer 数；RunPod、Lambda、CoreWeave、GCP Spot 未披露实时库存时页面显示“无法抓取数据”，表示未抓到公开供给数据，不代表没有库存。
 
 Vercel 只负责展示，不适合把抓取结果写回仓库。推荐用 GitHub Actions 定时抓取并提交 `data/compute-pricing.json`，提交后 Vercel 自动重新部署。
 

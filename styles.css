@@ -436,6 +436,16 @@ td {
   font-weight: 780;
 }
 
+.muted-cell {
+  color: var(--muted);
+}
+
+.empty-state {
+  fill: var(--muted);
+  font-size: 15px;
+  font-weight: 680;
+}
+
 pre {
   margin: 14px 0 0;
   overflow: auto;

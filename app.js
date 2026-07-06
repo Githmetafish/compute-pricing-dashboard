@@ -218,18 +218,27 @@ function changePct(first, latest, key = "price") {
   return ((latest[key] - first[key]) / first[key]) * 100;
 }
 
+function isSupplyObservable(row) {
+  return row.platform === "Vast.ai" || row.supply > 0;
+}
+
+function formatSupply(row) {
+  return isSupplyObservable(row) ? Math.round(row.supply).toLocaleString("en-US") : "无法抓取数据";
+}
+
 function renderCards() {
   const latest = latestBySeries();
   const pairs = latest.map((r) => firstLatestPair(r));
   const avgPrice = latest.reduce((sum, r) => sum + r.price, 0) / Math.max(latest.length, 1);
   const avgChange = pairs.reduce((sum, p) => sum + changePct(p.first, p.latest), 0) / Math.max(pairs.length, 1);
-  const totalSupply = latest.reduce((sum, r) => sum + r.supply, 0);
+  const observableSupply = latest.filter(isSupplyObservable);
+  const totalSupply = observableSupply.reduce((sum, r) => sum + r.supply, 0);
   const avgDiscount = latest.reduce((sum, r) => sum + r.discount, 0) / Math.max(latest.length, 1);
 
   const cards = [
     ["平均价格", fmtUsd(avgPrice), "当前 SKU 各平台/模式最新价均值，不跨 SXM/NVL 混算"],
     [trendLabel(), fmtChange(avgChange), trendNote()],
-    ["可观察供给", Math.round(totalSupply).toLocaleString("en-US"), "Vast.ai 为可观察 offer 数；其他平台 0 多数表示未披露"],
+    ["可观察供给", observableSupply.length ? Math.round(totalSupply).toLocaleString("en-US") : "无法抓取数据", "仅统计已抓到公开供给的来源；未披露平台显示无法抓取数据"],
     ["平均 Spot 折扣", fmtPct(avgDiscount), "折扣扩大通常先于 list price 变化"],
   ];
 
@@ -247,7 +256,7 @@ function assessAlertLevel() {
     const latest = latestBySeries(sku);
     const weak = latest.filter((row) => {
       const pair = firstLatestPair(row);
-      return changePct(pair.first, pair.latest) <= -10 && changePct(pair.first, pair.latest, "supply") >= 10;
+      return isSupplyObservable(row) && changePct(pair.first, pair.latest) <= -10 && changePct(pair.first, pair.latest, "supply") >= 10;
     });
     weakSeriesCount += weak.length;
     if (weak.length >= 2) weakSkuCount += 1;
@@ -265,13 +274,13 @@ function renderSignals() {
     return {
       ...r,
       priceChange: changePct(pair.first, pair.latest),
-      supplyChange: changePct(pair.first, pair.latest, "supply"),
+      supplyChange: isSupplyObservable(r) ? changePct(pair.first, pair.latest, "supply") : null,
     };
   });
 
-  const weak = pairRows.filter((r) => r.priceChange <= -10 && r.supplyChange >= 10);
-  const mild = pairRows.filter((r) => r.priceChange < 0 && r.supplyChange > 0 && r.priceChange > -10);
-  const stable = pairRows.filter((r) => r.priceChange >= 0 || r.supplyChange <= 0);
+  const weak = pairRows.filter((r) => r.priceChange <= -10 && r.supplyChange !== null && r.supplyChange >= 10);
+  const mild = pairRows.filter((r) => r.priceChange < 0 && r.supplyChange !== null && r.supplyChange > 0 && r.priceChange > -10);
+  const stable = pairRows.filter((r) => r.priceChange >= 0 || r.supplyChange === null || r.supplyChange <= 0);
   const level = assessAlertLevel();
 
   const items = [
@@ -292,7 +301,7 @@ function renderSignals() {
     {
       title: "粘性价格平台",
       body: stable.length
-        ? `${stable.map(seriesLabel).join("、")} 价格相对稳定或供给没有同步增加。公开 list price 通常滞后，不能据此排除风险。`
+        ? `${stable.map(seriesLabel).join("、")} 价格相对稳定、供给无法抓取或供给没有同步增加。公开 list price 通常滞后，不能据此排除风险。`
         : "所有平台都出现下跌与供给增加，需要提高风险权重。",
       cls: stable.length ? "" : "danger",
     },
@@ -311,7 +320,7 @@ function renderChart() {
   };
   els.chartTitle.textContent = `${state.sku} ${metricLabels[state.metric]}`;
 
-  const data = selectedRecords();
+  const data = state.metric === "supply" ? selectedRecords().filter(isSupplyObservable) : selectedRecords();
   const seriesRows = uniqueLatestRows(data).sort((a, b) => a.platform.localeCompare(b.platform) || a.mode.localeCompare(b.mode));
   els.chartLegend.innerHTML = seriesRows
     .map((row, index) => `<span><i style="background:${colors[index % colors.length]}"></i>${seriesLabel(row)}</span>`)
@@ -320,6 +329,13 @@ function renderChart() {
   const width = 920;
   const height = 360;
   const margin = { top: 18, right: 24, bottom: 42, left: 58 };
+
+  if (!data.length) {
+    els.chart.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    els.chart.innerHTML = `<text class="empty-state" x="${width / 2}" y="${height / 2}" text-anchor="middle">无法抓取供给数据</text>`;
+    return;
+  }
+
   const innerW = width - margin.left - margin.right;
   const innerH = height - margin.top - margin.bottom;
   const dates = unique(data.map((r) => r.date)).sort();
@@ -398,7 +414,7 @@ function renderTable() {
         <td>${fmtUsd(r.price)}</td>
         <td>${fmtUsd(r.avg7d)}</td>
         <td class="${cls}">${fmtChange(r.priceChange)}</td>
-        <td>${Math.round(r.supply).toLocaleString("en-US")}</td>
+        <td class="${isSupplyObservable(r) ? "" : "muted-cell"}">${formatSupply(r)}</td>
         <td>${fmtPct(r.discount)}</td>
         <td>${r.frequency}</td>
       </tr>`;
