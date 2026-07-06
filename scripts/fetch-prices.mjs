@@ -103,7 +103,7 @@ function priceNear(text, label, windowSize = 700) {
   const index = text.indexOf(label);
   if (index === -1) return null;
   const fragment = text.slice(index, index + windowSize);
-  const match = fragment.match(/\$(\d+(?:\.\d+)?)(?:\s*\/?\s*hr|\s*\/?\s*Hour)?/i);
+  const match = fragment.match(/\$\s*(\d+(?:\.\d+)?)(?:\s*\/?\s*(?:hr|Hour))?/i);
   return match ? Number(match[1]) : null;
 }
 
