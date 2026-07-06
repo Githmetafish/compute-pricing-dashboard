@@ -9,10 +9,13 @@ const outputPath = `${rootDir}/data/compute-pricing.json`;
 const today = new Date().toISOString().slice(0, 10);
 
 const args = new Set(process.argv.slice(2));
-const selectedSources = getArgValue("--sources")
-  ?.split(",")
-  .map((source) => source.trim())
-  .filter(Boolean);
+const sourceListArg = getArgValue("--sources");
+const selectedSources = sourceListArg
+  ? sourceListArg
+      .split(",")
+      .map((source) => source.trim())
+      .filter(Boolean)
+  : null;
 
 function getArgValue(flag) {
   const argv = process.argv.slice(2);
@@ -287,7 +290,7 @@ const fetchers = {
 };
 
 async function main() {
-  const sourceNames = selectedSources || Object.keys(fetchers);
+  const sourceNames = selectedSources?.length ? selectedSources : Object.keys(fetchers);
   const latestRows = [];
 
   for (const name of sourceNames) {
