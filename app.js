@@ -47,6 +47,7 @@ const els = {
   signalList: document.querySelector("#signalList"),
   metricCards: document.querySelector("#metricCards"),
   snapshotTable: document.querySelector("#snapshotTable"),
+  changeHeader: document.querySelector("#changeHeader"),
   dataFile: document.querySelector("#dataFile"),
   resetData: document.querySelector("#resetData"),
   downloadTemplate: document.querySelector("#downloadTemplate"),
@@ -58,6 +59,7 @@ const bySkuOrder = (a, b) => (skuProfiles[a]?.order || 999) - (skuProfiles[b]?.o
 const fmtUsd = (n) => `$${Number(n).toFixed(2)}`;
 const fmtPct = (n) => `${Math.round(Number(n) * 100)}%`;
 const fmtChange = (n) => `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`;
+const dayMs = 24 * 60 * 60 * 1000;
 
 function normalizeRecord(row) {
   return {
@@ -157,15 +159,58 @@ function selectedRecords() {
     .sort(byDate);
 }
 
-function latestByPlatform(sku = state.sku) {
-  return unique(records.filter((r) => r.sku === sku).map((r) => r.platform))
-    .map((platform) => records.filter((r) => r.sku === sku && r.platform === platform).sort(byDate).at(-1))
+function seriesKey(row) {
+  return `${row.platform}::${row.mode}`;
+}
+
+function seriesLabel(row) {
+  return row.mode === "unknown" ? row.platform : `${row.platform} ${row.mode}`;
+}
+
+function uniqueLatestRows(rows) {
+  return unique(rows.map(seriesKey))
+    .map((key) => rows.filter((r) => seriesKey(r) === key).sort(byDate).at(-1))
     .filter(Boolean);
 }
 
-function firstLatestPair(platform, sku) {
-  const series = records.filter((r) => r.platform === platform && r.sku === sku).sort(byDate);
-  return { first: series[0], latest: series.at(-1), series };
+function latestBySeries(sku = state.sku) {
+  return uniqueLatestRows(records.filter((r) => r.sku === sku));
+}
+
+function dateValue(date) {
+  return new Date(`${date}T00:00:00Z`).getTime();
+}
+
+function windowedSeries(series, latestDate, days) {
+  if (!latestDate) return [];
+  const cutoff = dateValue(latestDate) - (days - 1) * dayMs;
+  return series.filter((r) => dateValue(r.date) >= cutoff);
+}
+
+function firstLatestPair(row, days = 28) {
+  const series = records
+    .filter((r) => r.platform === row.platform && r.sku === row.sku && r.mode === row.mode)
+    .sort(byDate);
+  const latest = series.at(-1);
+  const periodSeries = windowedSeries(series, latest?.date, days);
+  return { first: periodSeries[0] || series[0], latest, series, periodSeries };
+}
+
+function historyDateCount(sku = state.sku) {
+  return unique(records.filter((r) => r.sku === sku).map((r) => r.date)).length;
+}
+
+function trendLabel() {
+  return historyDateCount() >= 28 ? "4周均价变化" : "样本期均价变化";
+}
+
+function trendWindowText() {
+  return historyDateCount() >= 28 ? "4周价格" : "样本期价格";
+}
+
+function trendNote() {
+  const days = historyDateCount();
+  return days >= 28 ? "最近 28 天同一 SKU/模式口径下的价格变化" : `当前只有 ${days} 天真实数据，4周趋势需继续积累`;
 }
 
 function changePct(first, latest, key = "price") {
@@ -174,16 +219,16 @@ function changePct(first, latest, key = "price") {
 }
 
 function renderCards() {
-  const latest = latestByPlatform();
-  const pairs = latest.map((r) => firstLatestPair(r.platform, r.sku));
+  const latest = latestBySeries();
+  const pairs = latest.map((r) => firstLatestPair(r));
   const avgPrice = latest.reduce((sum, r) => sum + r.price, 0) / Math.max(latest.length, 1);
   const avgChange = pairs.reduce((sum, p) => sum + changePct(p.first, p.latest), 0) / Math.max(pairs.length, 1);
   const totalSupply = latest.reduce((sum, r) => sum + r.supply, 0);
   const avgDiscount = latest.reduce((sum, r) => sum + r.discount, 0) / Math.max(latest.length, 1);
 
   const cards = [
-    ["平均价格", fmtUsd(avgPrice), "当前 SKU 各平台最新价均值，不跨 SXM/NVL 混算"],
-    ["4周均价变化", fmtChange(avgChange), "同一 SKU 口径下的价格变化"],
+    ["平均价格", fmtUsd(avgPrice), "当前 SKU 各平台/模式最新价均值，不跨 SXM/NVL 混算"],
+    [trendLabel(), fmtChange(avgChange), trendNote()],
     ["可用 GPU", Math.round(totalSupply).toLocaleString("en-US"), "最新横截面供给数量合计"],
     ["平均 Spot 折扣", fmtPct(avgDiscount), "折扣扩大通常先于 list price 变化"],
   ];
@@ -195,28 +240,28 @@ function renderCards() {
 
 function assessAlertLevel() {
   const skus = unique(records.map((r) => r.sku));
-  let weakPlatformCount = 0;
+  let weakSeriesCount = 0;
   let weakSkuCount = 0;
 
   skus.forEach((sku) => {
-    const platforms = unique(records.filter((r) => r.sku === sku).map((r) => r.platform));
-    const weak = platforms.filter((platform) => {
-      const pair = firstLatestPair(platform, sku);
+    const latest = latestBySeries(sku);
+    const weak = latest.filter((row) => {
+      const pair = firstLatestPair(row);
       return changePct(pair.first, pair.latest) <= -10 && changePct(pair.first, pair.latest, "supply") >= 10;
     });
-    weakPlatformCount += weak.length;
+    weakSeriesCount += weak.length;
     if (weak.length >= 2) weakSkuCount += 1;
   });
 
-  if (weakSkuCount >= 2) return { label: "中度预警", color: "var(--warning)", weakPlatformCount, weakSkuCount };
-  if (weakPlatformCount >= 2) return { label: "轻度预警", color: "var(--warning)", weakPlatformCount, weakSkuCount };
-  return { label: "正常观察", color: "var(--ok)", weakPlatformCount, weakSkuCount };
+  if (weakSkuCount >= 2) return { label: "中度预警", color: "var(--warning)", weakSeriesCount, weakSkuCount };
+  if (weakSeriesCount >= 2) return { label: "轻度预警", color: "var(--warning)", weakSeriesCount, weakSkuCount };
+  return { label: "正常观察", color: "var(--ok)", weakSeriesCount, weakSkuCount };
 }
 
 function renderSignals() {
-  const latest = latestByPlatform();
+  const latest = latestBySeries();
   const pairRows = latest.map((r) => {
-    const pair = firstLatestPair(r.platform, r.sku);
+    const pair = firstLatestPair(r);
     return {
       ...r,
       priceChange: changePct(pair.first, pair.latest),
@@ -233,21 +278,21 @@ function renderSignals() {
     {
       title: `${level.label}：价格与供给共振`,
       body: weak.length
-        ? `${weak.map((r) => r.platform).join("、")} 出现价格下跌超过 10% 且供给增加，需要继续观察是否扩散到 Lambda/CoreWeave。`
-        : "当前样本没有达到“4周价格下跌超过10%且供给增加”的平台组合。",
+        ? `${weak.map(seriesLabel).join("、")} 出现价格下跌超过 10% 且供给增加，需要继续观察是否扩散到 Lambda/CoreWeave。`
+        : `当前样本没有达到“${trendWindowText()}下跌超过10%且供给增加”的平台组合。`,
       cls: weak.length ? "warning" : "",
     },
     {
       title: "轻微走弱平台",
       body: mild.length
-        ? `${mild.map((r) => `${r.platform} ${fmtChange(r.priceChange)}`).join("，")}。这属于观察信号，暂不单独升级。`
+        ? `${mild.map((r) => `${seriesLabel(r)} ${fmtChange(r.priceChange)}`).join("，")}。这属于观察信号，暂不单独升级。`
         : "当前 SKU 未出现明显轻微走弱平台。",
       cls: mild.length ? "warning" : "",
     },
     {
       title: "粘性价格平台",
       body: stable.length
-        ? `${stable.map((r) => r.platform).join("、")} 价格相对稳定或供给没有同步增加。公开 list price 通常滞后，不能据此排除风险。`
+        ? `${stable.map(seriesLabel).join("、")} 价格相对稳定或供给没有同步增加。公开 list price 通常滞后，不能据此排除风险。`
         : "所有平台都出现下跌与供给增加，需要提高风险权重。",
       cls: stable.length ? "" : "danger",
     },
@@ -267,9 +312,9 @@ function renderChart() {
   els.chartTitle.textContent = `${state.sku} ${metricLabels[state.metric]}`;
 
   const data = selectedRecords();
-  const platforms = unique(data.map((r) => r.platform));
-  els.chartLegend.innerHTML = platforms
-    .map((platform, index) => `<span><i style="background:${colors[index % colors.length]}"></i>${platform}</span>`)
+  const seriesRows = uniqueLatestRows(data).sort((a, b) => a.platform.localeCompare(b.platform) || a.mode.localeCompare(b.mode));
+  els.chartLegend.innerHTML = seriesRows
+    .map((row, index) => `<span><i style="background:${colors[index % colors.length]}"></i>${seriesLabel(row)}</span>`)
     .join("");
 
   const width = 920;
@@ -301,9 +346,9 @@ function renderChart() {
     .map((date) => `<text class="axis-label" x="${x(date)}" y="${height - 12}" text-anchor="middle">${date.slice(5)}</text>`)
     .join("");
 
-  const lines = platforms
-    .map((platform, index) => {
-      const series = data.filter((r) => r.platform === platform).sort(byDate);
+  const lines = seriesRows
+    .map((row, index) => {
+      const series = data.filter((r) => r.platform === row.platform && r.mode === row.mode).sort(byDate);
       const points = series.map((r) => `${x(r.date)},${y(r[state.metric])}`).join(" ");
       const circles = series
         .map((r) => `<circle class="point" cx="${x(r.date)}" cy="${y(r[state.metric])}" r="4" fill="${colors[index % colors.length]}"></circle>`)
@@ -322,23 +367,26 @@ function renderChart() {
   `;
 }
 
-function movingAverage(items, key) {
-  const slice = items.slice(-2);
+function movingAverage(items, key, days = 7) {
+  const latest = items.at(-1);
+  const slice = windowedSeries(items, latest?.date, days);
   const value = slice.reduce((sum, r) => sum + r[key], 0) / Math.max(slice.length, 1);
   return value || 0;
 }
 
 function renderTable() {
-  const rows = latestByPlatform()
+  if (els.changeHeader) els.changeHeader.textContent = historyDateCount() >= 28 ? "4周变化" : "样本期变化";
+
+  const rows = latestBySeries()
     .map((row) => {
-      const pair = firstLatestPair(row.platform, row.sku);
+      const pair = firstLatestPair(row);
       return {
         ...row,
         avg7d: movingAverage(pair.series, "price"),
         priceChange: changePct(pair.first, pair.latest),
       };
     })
-    .sort((a, b) => a.platform.localeCompare(b.platform));
+    .sort((a, b) => a.platform.localeCompare(b.platform) || a.mode.localeCompare(b.mode));
 
   els.snapshotTable.innerHTML = rows
     .map((r) => {
