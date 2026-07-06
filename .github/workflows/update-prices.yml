@@ -1,0 +1,43 @@
+name: Update compute pricing data
+
+on:
+  workflow_dispatch:
+  schedule:
+    # After GCP Spot's usual Pacific-time daily price boundary.
+    - cron: "30 10 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fetch latest pricing
+        env:
+          VAST_API_KEY: ${{ secrets.VAST_API_KEY }}
+          GCP_SPOT_JSON_URL: ${{ secrets.GCP_SPOT_JSON_URL }}
+        run: npm run fetch:prices -- --soft-fail
+
+      - name: Validate data
+        run: npm run validate:data
+
+      - name: Commit data update
+        run: |
+          if git diff --quiet -- data/compute-pricing.json; then
+            echo "No pricing data changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/compute-pricing.json
+          git commit -m "Update compute pricing data"
+          git push

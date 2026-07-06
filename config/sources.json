@@ -1,0 +1,49 @@
+{
+  "trackedSkus": [
+    {
+      "sku": "H100 SXM",
+      "aliases": ["H100 SXM", "NVIDIA H100 SXM", "NVIDIA HGX H100", "H100"]
+    },
+    {
+      "sku": "H100 NVL",
+      "aliases": ["H100 NVL", "NVIDIA H100 NVL"]
+    },
+    {
+      "sku": "H200 SXM",
+      "aliases": ["H200", "NVIDIA HGX H200", "NVIDIA H200"]
+    },
+    {
+      "sku": "B200",
+      "aliases": ["B200", "NVIDIA HGX B200", "NVIDIA B200 SXM6"]
+    }
+  ],
+  "sources": {
+    "runpod": {
+      "platform": "RunPod",
+      "url": "https://www.runpod.io/pricing",
+      "frequency": "daily"
+    },
+    "lambda": {
+      "platform": "Lambda",
+      "url": "https://lambda.ai/pricing",
+      "frequency": "weekly"
+    },
+    "coreweave": {
+      "platform": "CoreWeave",
+      "url": "https://www.coreweave.com/pricing",
+      "frequency": "weekly"
+    },
+    "vast": {
+      "platform": "Vast.ai",
+      "url": "https://console.vast.ai/api/v0/bundles/",
+      "frequency": "daily",
+      "requiresEnv": "VAST_API_KEY"
+    },
+    "gcpSpot": {
+      "platform": "GCP Spot",
+      "frequency": "daily",
+      "inputFile": "data/manual/gcp-spot.json",
+      "remoteEnv": "GCP_SPOT_JSON_URL"
+    }
+  }
+}

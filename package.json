@@ -1,0 +1,14 @@
+{
+  "name": "compute-pricing-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "start": "python3 -m http.server 4173",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod",
+    "fetch:prices": "node scripts/fetch-prices.mjs",
+    "validate:data": "node scripts/normalize-data.mjs --check data/compute-pricing.json sample-data.json",
+    "normalize:data": "node scripts/normalize-data.mjs"
+  }
+}

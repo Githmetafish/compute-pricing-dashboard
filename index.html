@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 算力价格监控</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Compute Pricing Monitor</p>
+          <h1>AI 算力价格监控</h1>
+        </div>
+        <div class="topbar-actions">
+          <label class="file-action" for="dataFile">
+            <span aria-hidden="true">↥</span>
+            导入数据
+          </label>
+          <input id="dataFile" type="file" accept=".json,.csv" />
+          <button class="icon-button" id="resetData" type="button" title="恢复样本数据" aria-label="恢复样本数据">↺</button>
+        </div>
+      </header>
+
+      <section class="status-strip" aria-label="监控状态">
+        <div>
+          <span class="label">最新日期</span>
+          <strong id="latestDate">-</strong>
+        </div>
+        <div>
+          <span class="label">覆盖平台</span>
+          <strong id="platformCount">-</strong>
+        </div>
+        <div>
+          <span class="label">跟踪 SKU</span>
+          <strong id="skuCount">-</strong>
+        </div>
+        <div>
+          <span class="label">当前预警</span>
+          <strong id="alertLevel">-</strong>
+        </div>
+      </section>
+
+      <section class="control-band" aria-label="筛选器">
+        <div class="segmented" id="skuTabs"></div>
+        <div class="control-row">
+          <label>
+            平台
+            <select id="platformFilter"></select>
+          </label>
+          <label>
+            视图
+            <select id="metricMode">
+              <option value="price">价格趋势</option>
+              <option value="supply">可用供给</option>
+              <option value="discount">折扣率</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel trend-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Trend</p>
+              <h2 id="chartTitle">价格趋势</h2>
+            </div>
+            <div class="legend" id="chartLegend"></div>
+          </div>
+          <div class="chart-wrap">
+            <svg id="trendChart" role="img" aria-label="算力价格趋势图"></svg>
+          </div>
+        </article>
+
+        <article class="panel signal-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Signals</p>
+              <h2>预警信号</h2>
+            </div>
+          </div>
+          <div id="signalList" class="signal-list"></div>
+        </article>
+      </section>
+
+      <section class="metrics-row" id="metricCards" aria-label="关键指标"></section>
+
+      <section class="table-section">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Latest Snapshot</p>
+            <h2>最新横截面</h2>
+          </div>
+          <button class="text-button" id="downloadTemplate" type="button">下载数据模板</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>平台</th>
+                <th>SKU</th>
+                <th>模式</th>
+                <th>$/GPU-hour</th>
+                <th>7日均价</th>
+                <th>4周变化</th>
+                <th>可用 GPU</th>
+                <th>Spot 折扣</th>
+                <th>频率</th>
+              </tr>
+            </thead>
+            <tbody id="snapshotTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="schema-section">
+        <div>
+          <p class="eyebrow">Data Contract</p>
+          <h2>数据格式</h2>
+        </div>
+        <pre><code>{
+  "date": "2026-07-06",
+  "platform": "GCP Spot",
+  "sku": "H100 SXM",
+  "mode": "spot",
+  "price": 3.62,
+  "supply": 128,
+  "discount": 0.59,
+  "frequency": "daily"
+}</code></pre>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
