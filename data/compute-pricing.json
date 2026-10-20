@@ -2080,6 +2080,26 @@
     "frequency": "weekly"
   },
   {
+    "date": "2026-10-20",
+    "platform": "CoreWeave",
+    "sku": "B200",
+    "mode": "on-demand",
+    "price": 8.6,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-10-20",
+    "platform": "CoreWeave",
+    "sku": "B200",
+    "mode": "spot",
+    "price": 4.26375,
+    "supply": 0,
+    "discount": 0.5042151162790698,
+    "frequency": "weekly"
+  },
+  {
     "date": "2026-07-06",
     "platform": "GCP Spot us-central1",
     "sku": "B200",
@@ -3120,6 +3140,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "GCP Spot us-central1",
+    "sku": "B200",
+    "mode": "spot",
+    "price": 4.9542,
+    "supply": 0,
+    "discount": 0.3849534450651768,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "GCP Spot us-east5",
     "sku": "B200",
@@ -4160,6 +4190,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "GCP Spot us-east5",
+    "sku": "B200",
+    "mode": "spot",
+    "price": 1.4499,
+    "supply": 0,
+    "discount": 0.8200000000000001,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "GCP Spot us-west4",
     "sku": "B200",
@@ -5200,6 +5240,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "GCP Spot us-west4",
+    "sku": "B200",
+    "mode": "spot",
+    "price": 1.4499,
+    "supply": 0,
+    "discount": 0.8200000000000001,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "Lambda",
     "sku": "B200",
@@ -6240,6 +6290,16 @@
     "frequency": "weekly"
   },
   {
+    "date": "2026-10-20",
+    "platform": "Lambda",
+    "sku": "B200",
+    "mode": "on-demand",
+    "price": 6.69,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
     "date": "2026-07-06",
     "platform": "RunPod",
     "sku": "B200",
@@ -7271,6 +7331,16 @@
   },
   {
     "date": "2026-10-19",
+    "platform": "RunPod",
+    "sku": "B200",
+    "mode": "secure",
+    "price": 7.99,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-10-20",
     "platform": "RunPod",
     "sku": "B200",
     "mode": "secure",
@@ -8300,6 +8370,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "Vast.ai",
+    "sku": "B200",
+    "mode": "market",
+    "price": 8.610416666666666,
+    "supply": 4,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "RunPod",
     "sku": "H100 NVL",
@@ -9331,6 +9411,16 @@
   },
   {
     "date": "2026-10-19",
+    "platform": "RunPod",
+    "sku": "H100 NVL",
+    "mode": "secure",
+    "price": 3.19,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-10-20",
     "platform": "RunPod",
     "sku": "H100 NVL",
     "mode": "secure",
@@ -10320,6 +10410,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "Vast.ai",
+    "sku": "H100 NVL",
+    "mode": "market",
+    "price": 3.028888888888881,
+    "supply": 1,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "CoreWeave",
     "sku": "H100 SXM",
@@ -12391,6 +12491,26 @@
   },
   {
     "date": "2026-10-19",
+    "platform": "CoreWeave",
+    "sku": "H100 SXM",
+    "mode": "spot",
+    "price": 2.46375,
+    "supply": 0,
+    "discount": 0.5997156783103168,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-10-20",
+    "platform": "CoreWeave",
+    "sku": "H100 SXM",
+    "mode": "on-demand",
+    "price": 6.155,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-10-20",
     "platform": "CoreWeave",
     "sku": "H100 SXM",
     "mode": "spot",
@@ -13440,6 +13560,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "GCP Spot us-central1",
+    "sku": "H100 SXM",
+    "mode": "spot",
+    "price": 5.3073,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "GCP Spot us-east5",
     "sku": "H100 SXM",
@@ -14471,6 +14601,16 @@
   },
   {
     "date": "2026-10-19",
+    "platform": "GCP Spot us-east5",
+    "sku": "H100 SXM",
+    "mode": "spot",
+    "price": 4.8253,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-10-20",
     "platform": "GCP Spot us-east5",
     "sku": "H100 SXM",
     "mode": "spot",
@@ -15520,6 +15660,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "GCP Spot us-west4",
+    "sku": "H100 SXM",
+    "mode": "spot",
+    "price": 2.9145,
+    "supply": 0,
+    "discount": 0.3061971390421878,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "Lambda",
     "sku": "H100 SXM",
@@ -16560,6 +16710,16 @@
     "frequency": "weekly"
   },
   {
+    "date": "2026-10-20",
+    "platform": "Lambda",
+    "sku": "H100 SXM",
+    "mode": "on-demand",
+    "price": 3.99,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
     "date": "2026-07-06",
     "platform": "RunPod",
     "sku": "H100 SXM",
@@ -17591,6 +17751,16 @@
   },
   {
     "date": "2026-10-19",
+    "platform": "RunPod",
+    "sku": "H100 SXM",
+    "mode": "secure",
+    "price": 3.99,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-10-20",
     "platform": "RunPod",
     "sku": "H100 SXM",
     "mode": "secure",
@@ -18610,6 +18780,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "Vast.ai",
+    "sku": "H100 SXM",
+    "mode": "market",
+    "price": 1.7872222222222225,
+    "supply": 3,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "CoreWeave",
     "sku": "H200 SXM",
@@ -20690,6 +20870,26 @@
     "frequency": "weekly"
   },
   {
+    "date": "2026-10-20",
+    "platform": "CoreWeave",
+    "sku": "H200 SXM",
+    "mode": "on-demand",
+    "price": 6.305,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "weekly"
+  },
+  {
+    "date": "2026-10-20",
+    "platform": "CoreWeave",
+    "sku": "H200 SXM",
+    "mode": "spot",
+    "price": 2.61625,
+    "supply": 0,
+    "discount": 0.5850515463917525,
+    "frequency": "weekly"
+  },
+  {
     "date": "2026-07-06",
     "platform": "GCP Spot us-central1",
     "sku": "H200 SXM",
@@ -21730,6 +21930,16 @@
     "frequency": "daily"
   },
   {
+    "date": "2026-10-20",
+    "platform": "GCP Spot us-central1",
+    "sku": "H200 SXM",
+    "mode": "spot",
+    "price": 5.586,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
     "date": "2026-07-06",
     "platform": "RunPod",
     "sku": "H200 SXM",
@@ -22761,6 +22971,16 @@
   },
   {
     "date": "2026-10-19",
+    "platform": "RunPod",
+    "sku": "H200 SXM",
+    "mode": "secure",
+    "price": 5.29,
+    "supply": 0,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-10-20",
     "platform": "RunPod",
     "sku": "H200 SXM",
     "mode": "secure",
@@ -23786,6 +24006,16 @@
     "mode": "market",
     "price": 5.045932017543859,
     "supply": 1,
+    "discount": 0,
+    "frequency": "daily"
+  },
+  {
+    "date": "2026-10-20",
+    "platform": "Vast.ai",
+    "sku": "H200 SXM",
+    "mode": "market",
+    "price": 5.00109649122807,
+    "supply": 8,
     "discount": 0,
     "frequency": "daily"
   }
